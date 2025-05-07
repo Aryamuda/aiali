@@ -4,34 +4,41 @@ from dotenv import load_dotenv
 from dashscope import Generation
 import dashscope
 
-# === LOAD .env ===
+# === LOAD ENV ===
 load_dotenv()
 DASHSCOPE_API_KEY = st.secrets.get("DASHSCOPE_API_KEY") or os.getenv("DASHSCOPE_API_KEY")
 
-# === DASHSCOPE BASE URL ===
+# === VALIDATE API KEY ===
+if not DASHSCOPE_API_KEY:
+    st.error("❌ No API key found. Set it in .env or Streamlit Secrets as 'DASHSCOPE_API_KEY'.")
+    st.stop()
+
+# === SET BASE URL ===
 dashscope.base_http_api_url = 'https://dashscope-intl.aliyuncs.com/api/v1'
 
-# === INITIALIZE STATE ===
+# === INIT STATE ===
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 if 'username' not in st.session_state:
     st.session_state.username = None
 
-# === UI SETUP ===
+# === UI ===
 st.set_page_config(page_title="Qwen Chat App", page_icon="🤖")
 st.title("🤖 Qwen Chat with Memory")
 st.markdown("Ask anything. Powered by **Qwen-Plus** ⚡")
 
-# === GET USERNAME ===
+# === USERNAME FORM ===
 if not st.session_state.username:
     with st.form("name_form"):
-        st.session_state.username = st.text_input("Masukin nama lu:", placeholder="Contoh: Bro Quant")
+        name = st.text_input("Masukin nama lu:", placeholder="Contoh: Bro Quant")
         submitted = st.form_submit_button("Start Chat")
-        if not submitted:
+        if submitted and name:
+            st.session_state.username = name
+            st.rerun()
+        else:
             st.stop()
-    st.rerun()
 
-# === RESET BUTTON ===
+# === RESET CHAT ===
 col1, col2 = st.columns([3, 1])
 with col2:
     if st.button("🔁 Reset Chat"):
@@ -45,12 +52,12 @@ if not st.session_state.chat_history:
         "content": f"Kamu adalah asisten pribadi buat {st.session_state.username}, bantu dia sebaik mungkin."
     })
 
-# === SHOW CHAT HISTORY ===
+# === SHOW HISTORY ===
 for msg in st.session_state.chat_history[1:]:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# === INPUT HANDLER ===
+# === CHAT INPUT ===
 user_input = st.chat_input("Tulis pertanyaanmu...")
 
 if user_input:
@@ -64,12 +71,19 @@ if user_input:
                 api_key=DASHSCOPE_API_KEY,
                 model="qwen-plus",
                 messages=st.session_state.chat_history,
-                result_format='message'
+                result_format="message"
             )
-            reply = response.output.choices[0].message.content
-        except Exception as e:
-            reply = f"⚠️ Error: {str(e)}"
 
+            # === SAFE CHECK RESPONSE ===
+            if response and response.output and hasattr(response.output, "choices"):
+                reply = response.output.choices[0].message.content
+            else:
+                reply = f"⚠️ Gagal dapet balasan dari Dashscope. Cek response: `{response}`"
+
+        except Exception as e:
+            reply = f"⚠️ Error pas call Dashscope: {str(e)}"
+
+        # === DISPLAY REPLY ===
         st.session_state.chat_history.append({"role": "assistant", "content": reply})
         with st.chat_message("assistant"):
             st.markdown(reply)
