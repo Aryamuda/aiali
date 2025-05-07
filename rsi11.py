@@ -6,7 +6,7 @@ import dashscope
 
 # === LOAD .env ===
 load_dotenv()
-DASHSCOPE_API_KEY = os.getenv("DASHSCOPE_API_KEY")
+DASHSCOPE_API_KEY = st.secrets.get("DASHSCOPE_API_KEY") or os.getenv("DASHSCOPE_API_KEY")
 
 # === DASHSCOPE BASE URL ===
 dashscope.base_http_api_url = 'https://dashscope-intl.aliyuncs.com/api/v1'
