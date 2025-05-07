@@ -23,14 +23,14 @@ if 'username' not in st.session_state:
     st.session_state.username = None
 
 # === UI ===
-st.set_page_config(page_title="Qwen Chat App", page_icon="🤖")
-st.title("🤖 Qwen Chat with Memory")
-st.markdown("Ask anything. Powered by **Qwen-Plus** ⚡")
+st.set_page_config(page_title="Chat App", page_icon="🤖")
+st.title("🤖 Chat with Memory")
+st.markdown("Ask anything")
 
 # === USERNAME FORM ===
 if not st.session_state.username:
     with st.form("name_form"):
-        name = st.text_input("Masukin nama lu:", placeholder="Contoh: Bro Quant")
+        name = st.text_input("Enter your name motherfucker:", placeholder="Contoh: Nigger")
         submitted = st.form_submit_button("Start Chat")
         if submitted and name:
             st.session_state.username = name
@@ -58,7 +58,7 @@ for msg in st.session_state.chat_history[1:]:
         st.markdown(msg["content"])
 
 # === CHAT INPUT ===
-user_input = st.chat_input("Tulis pertanyaanmu...")
+user_input = st.chat_input("What's on your mind vro...")
 
 if user_input:
     st.session_state.chat_history.append({"role": "user", "content": user_input})
