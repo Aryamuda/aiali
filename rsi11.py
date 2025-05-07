@@ -65,7 +65,7 @@ if user_input:
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    with st.spinner("Qwen mikir..."):
+    with st.spinner("Im thinking, be patient bitch..."):
         try:
             response = Generation.call(
                 api_key=DASHSCOPE_API_KEY,
