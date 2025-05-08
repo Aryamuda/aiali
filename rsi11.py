@@ -3,6 +3,10 @@ import os
 from dotenv import load_dotenv
 from dashscope import Generation
 import dashscope
+import pandas as pd
+import openpyxl
+import PyPDF2
+import io
 
 # === LOAD ENV ===
 load_dotenv()
@@ -37,6 +41,69 @@ if not st.session_state.username:
             st.rerun()
         else:
             st.stop()
+
+# === FILE UPLOAD ===
+uploaded_file = st.file_uploader("Choose a file", type=["csv", "xlsx", "pdf", "txt"])
+
+if uploaded_file is not None:
+    file_type = uploaded_file.name.split(".")[-1].lower()  # Get file extension
+
+    # === HANDLE CSV FILE ===
+    if file_type == "csv":
+        try:
+            st.write("Reading CSV file...")
+            df = pd.read_csv(uploaded_file)
+            if df.empty:
+                st.error("⚠️ CSV file is empty!")
+            else:
+                st.write(df.head())  # Show the first few rows of the dataframe
+        except Exception as e:
+            st.error(f"⚠️ Error reading CSV file: {e}")
+
+    # === HANDLE XLSX FILE ===
+    elif file_type == "xlsx":
+        try:
+            st.write("Reading Excel file...")
+            wb = openpyxl.load_workbook(uploaded_file)
+            sheet = wb.active
+            data = sheet.values
+            df = pd.DataFrame(data)
+            if df.empty:
+                st.error("⚠️ Excel file is empty!")
+            else:
+                st.write(df.head())  # Show the first few rows of the data
+        except Exception as e:
+            st.error(f"⚠️ Error reading Excel file: {e}")
+
+    # === HANDLE PDF FILE ===
+    elif file_type == "pdf":
+        try:
+            st.write("Reading PDF file...")
+            pdf_reader = PyPDF2.PdfReader(uploaded_file)
+            text = ""
+            if len(pdf_reader.pages) == 0:
+                st.error("⚠️ PDF is empty!")
+            else:
+                for page in pdf_reader.pages:
+                    text += page.extract_text()
+                if not text.strip():
+                    st.error("⚠️ No readable text found in PDF!")
+                else:
+                    st.text(text)  # Show extracted text from the PDF
+        except Exception as e:
+            st.error(f"⚠️ Error reading PDF file: {e}")
+
+    # === HANDLE TXT FILE ===
+    elif file_type == "txt":
+        try:
+            st.write("Reading Text file...")
+            text = uploaded_file.getvalue().decode("utf-8")
+            if not text.strip():
+                st.error("⚠️ Text file is empty!")
+            else:
+                st.write(text)  # Show text content of the file
+        except Exception as e:
+            st.error(f"⚠️ Error reading Text file: {e}")
 
 # === RESET CHAT ===
 col1, col2 = st.columns([3, 1])
