@@ -29,7 +29,7 @@ st.markdown("Ask anything")
 
 if not st.session_state.username:
     with st.form("name_form"):
-        name = st.text_input("Enter your name:", placeholder="Contoh: John Doe")
+        name = st.text_input("Enter your name:", placeholder="Example: Nigger")
         submitted = st.form_submit_button("Start Chat")
         if submitted and name:
             st.session_state.username = name
@@ -101,7 +101,7 @@ if user_input:
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    with st.spinner("Im thinking, be patient..."):
+    with st.spinner("Im thinking, be patient bitch..."):
         try:
             response = Generation.call(
                 api_key=DASHSCOPE_API_KEY,
@@ -113,7 +113,7 @@ if user_input:
             if response and response.output and hasattr(response.output, "choices"):
                 reply = response.output.choices[0].message.content
             else:
-                reply = f"⚠️ Gagal dapet balasan dari Dashscope. Cek response: `{response}`"
+                reply = f"⚠️ Unable to getting back server. Check response: `{response}`"
 
         except Exception as e:
             reply = f"⚠️ Error pas call Dashscope: {str(e)}"
