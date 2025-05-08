@@ -6,7 +6,6 @@ import dashscope
 import pandas as pd
 import openpyxl
 import PyPDF2
-import io
 
 # === LOAD ENV ===
 load_dotenv()
