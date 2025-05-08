@@ -3,9 +3,7 @@ import os
 from dotenv import load_dotenv
 from dashscope import Generation
 import dashscope
-import pandas as pd
-import openpyxl
-import PyPDF2
+from PyPDF2 import PdfReader
 
 # === LOAD ENV ===
 load_dotenv()
@@ -42,67 +40,52 @@ if not st.session_state.username:
             st.stop()
 
 # === FILE UPLOAD ===
-uploaded_file = st.file_uploader("Choose a file", type=["csv", "xlsx", "pdf", "txt"])
+uploaded_file = st.file_uploader("Upload a file", type=["csv", "xlsx", "pdf", "txt"])
 
 if uploaded_file is not None:
-    file_type = uploaded_file.name.split(".")[-1].lower()  # Get file extension
+    # Process the file based on its type
+    if uploaded_file.type == "application/pdf":
+        # If it's a PDF, extract text
+        pdf_reader = PdfReader(uploaded_file)
+        text = ""
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            text += page.extract_text()
+        
+        st.text_area("Extracted PDF Text", text, height=200)
+        st.session_state.chat_history.append({
+            "role": "system",
+            "content": f"Here's the content from the uploaded PDF:\n{text}"
+        })
+    
+    elif uploaded_file.type == "text/csv":
+        # If it's a CSV, you can use pandas to extract the data
+        import pandas as pd
+        df = pd.read_csv(uploaded_file)
+        st.dataframe(df)
+        st.session_state.chat_history.append({
+            "role": "system",
+            "content": f"Here's the data from the uploaded CSV:\n{df.head()}"
+        })
+    
+    elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+        # If it's an Excel file (xlsx), use pandas to read it
+        import pandas as pd
+        df = pd.read_excel(uploaded_file)
+        st.dataframe(df)
+        st.session_state.chat_history.append({
+            "role": "system",
+            "content": f"Here's the data from the uploaded Excel file:\n{df.head()}"
+        })
 
-    # === HANDLE CSV FILE ===
-    if file_type == "csv":
-        try:
-            st.write("Reading CSV file...")
-            df = pd.read_csv(uploaded_file)
-            if df.empty:
-                st.error("⚠️ CSV file is empty!")
-            else:
-                st.write(df.head())  # Show the first few rows of the dataframe
-        except Exception as e:
-            st.error(f"⚠️ Error reading CSV file: {e}")
-
-    # === HANDLE XLSX FILE ===
-    elif file_type == "xlsx":
-        try:
-            st.write("Reading Excel file...")
-            wb = openpyxl.load_workbook(uploaded_file)
-            sheet = wb.active
-            data = sheet.values
-            df = pd.DataFrame(data)
-            if df.empty:
-                st.error("⚠️ Excel file is empty!")
-            else:
-                st.write(df.head())  # Show the first few rows of the data
-        except Exception as e:
-            st.error(f"⚠️ Error reading Excel file: {e}")
-
-    # === HANDLE PDF FILE ===
-    elif file_type == "pdf":
-        try:
-            st.write("Reading PDF file...")
-            pdf_reader = PyPDF2.PdfReader(uploaded_file)
-            text = ""
-            if len(pdf_reader.pages) == 0:
-                st.error("⚠️ PDF is empty!")
-            else:
-                for page in pdf_reader.pages:
-                    text += page.extract_text()
-                if not text.strip():
-                    st.error("⚠️ No readable text found in PDF!")
-                else:
-                    st.text(text)  # Show extracted text from the PDF
-        except Exception as e:
-            st.error(f"⚠️ Error reading PDF file: {e}")
-
-    # === HANDLE TXT FILE ===
-    elif file_type == "txt":
-        try:
-            st.write("Reading Text file...")
-            text = uploaded_file.getvalue().decode("utf-8")
-            if not text.strip():
-                st.error("⚠️ Text file is empty!")
-            else:
-                st.write(text)  # Show text content of the file
-        except Exception as e:
-            st.error(f"⚠️ Error reading Text file: {e}")
+    elif uploaded_file.type == "text/plain":
+        # If it's a plain text file, read it
+        text = uploaded_file.read().decode("utf-8")
+        st.text_area("Text File Content", text, height=200)
+        st.session_state.chat_history.append({
+            "role": "system",
+            "content": f"Here's the content from the uploaded text file:\n{text}"
+        })
 
 # === RESET CHAT ===
 col1, col2 = st.columns([3, 1])
