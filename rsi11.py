@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from dashscope import Generation
 import dashscope
 from PyPDF2 import PdfReader
+import pandas as pd
 
 # === LOAD ENV ===
 load_dotenv()
@@ -52,17 +53,16 @@ if uploaded_file is not None:
             page = pdf_reader.pages[page_num]
             text += page.extract_text()
         
-        st.text_area("Extracted PDF Text", text, height=200)
+        # Append PDF content to chat history without showing to the user
         st.session_state.chat_history.append({
             "role": "system",
             "content": f"Here's the content from the uploaded PDF:\n{text}"
         })
     
     elif uploaded_file.type == "text/csv":
-        # If it's a CSV, you can use pandas to extract the data
-        import pandas as pd
+        # If it's a CSV, use pandas to extract the data
         df = pd.read_csv(uploaded_file)
-        st.dataframe(df)
+        # Append CSV content to chat history without showing to the user
         st.session_state.chat_history.append({
             "role": "system",
             "content": f"Here's the data from the uploaded CSV:\n{df.head()}"
@@ -70,9 +70,8 @@ if uploaded_file is not None:
     
     elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
         # If it's an Excel file (xlsx), use pandas to read it
-        import pandas as pd
         df = pd.read_excel(uploaded_file)
-        st.dataframe(df)
+        # Append Excel content to chat history without showing to the user
         st.session_state.chat_history.append({
             "role": "system",
             "content": f"Here's the data from the uploaded Excel file:\n{df.head()}"
@@ -81,7 +80,7 @@ if uploaded_file is not None:
     elif uploaded_file.type == "text/plain":
         # If it's a plain text file, read it
         text = uploaded_file.read().decode("utf-8")
-        st.text_area("Text File Content", text, height=200)
+        # Append text file content to chat history without showing to the user
         st.session_state.chat_history.append({
             "role": "system",
             "content": f"Here's the content from the uploaded text file:\n{text}"
