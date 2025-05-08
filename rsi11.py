@@ -53,7 +53,7 @@ if uploaded_file is not None:
             page = pdf_reader.pages[page_num]
             text += page.extract_text()
         
-        # Append the actual PDF content to chat history (not just a placeholder)
+        # Append the actual PDF content to chat history (without showing to the user)
         st.session_state.chat_history.append({
             "role": "system",
             "content": f"Here's the content from the uploaded PDF:\n{text}"
@@ -64,7 +64,7 @@ if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
         csv_content = df.to_string()  # Convert dataframe to string
         
-        # Append the actual CSV content to chat history
+        # Append the actual CSV content to chat history (without showing to the user)
         st.session_state.chat_history.append({
             "role": "system",
             "content": f"Here's the data from the uploaded CSV:\n{csv_content}"
@@ -75,7 +75,7 @@ if uploaded_file is not None:
         df = pd.read_excel(uploaded_file)
         excel_content = df.to_string()  # Convert dataframe to string
         
-        # Append the actual Excel content to chat history
+        # Append the actual Excel content to chat history (without showing to the user)
         st.session_state.chat_history.append({
             "role": "system",
             "content": f"Here's the data from the uploaded Excel file:\n{excel_content}"
@@ -85,7 +85,7 @@ if uploaded_file is not None:
         # If it's a plain text file, read it
         text = uploaded_file.read().decode("utf-8")
         
-        # Append the actual text file content to chat history
+        # Append the actual text file content to chat history (without showing to the user)
         st.session_state.chat_history.append({
             "role": "system",
             "content": f"Here's the content from the uploaded text file:\n{text}"
