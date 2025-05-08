@@ -53,37 +53,42 @@ if uploaded_file is not None:
             page = pdf_reader.pages[page_num]
             text += page.extract_text()
         
-        # Append PDF content to chat history without showing to the user
+        # Append the actual PDF content to chat history (not just a placeholder)
         st.session_state.chat_history.append({
             "role": "system",
-            "content": f"Here's the content from the uploaded PDF."
+            "content": f"Here's the content from the uploaded PDF:\n{text}"
         })
     
     elif uploaded_file.type == "text/csv":
         # If it's a CSV, use pandas to extract the data
         df = pd.read_csv(uploaded_file)
-        # Append CSV content to chat history without showing to the user
+        csv_content = df.to_string()  # Convert dataframe to string
+        
+        # Append the actual CSV content to chat history
         st.session_state.chat_history.append({
             "role": "system",
-            "content": f"Here's the data from the uploaded CSV."
+            "content": f"Here's the data from the uploaded CSV:\n{csv_content}"
         })
     
     elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
         # If it's an Excel file (xlsx), use pandas to read it
         df = pd.read_excel(uploaded_file)
-        # Append Excel content to chat history without showing to the user
+        excel_content = df.to_string()  # Convert dataframe to string
+        
+        # Append the actual Excel content to chat history
         st.session_state.chat_history.append({
             "role": "system",
-            "content": f"Here's the data from the uploaded Excel file."
+            "content": f"Here's the data from the uploaded Excel file:\n{excel_content}"
         })
 
     elif uploaded_file.type == "text/plain":
         # If it's a plain text file, read it
         text = uploaded_file.read().decode("utf-8")
-        # Append text file content to chat history without showing to the user
+        
+        # Append the actual text file content to chat history
         st.session_state.chat_history.append({
             "role": "system",
-            "content": f"Here's the content from the uploaded text file."
+            "content": f"Here's the content from the uploaded text file:\n{text}"
         })
 
 # === RESET CHAT ===
