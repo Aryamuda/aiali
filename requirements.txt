@@ -1,6 +1,4 @@
 streamlit
 python-dotenv
 dashscope
-openpyxl
-PyPDF2
-io
+
