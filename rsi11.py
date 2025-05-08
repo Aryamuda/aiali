@@ -32,7 +32,7 @@ st.markdown("Ask anything")
 # === USERNAME FORM ===
 if not st.session_state.username:
     with st.form("name_form"):
-        name = st.text_input("Enter your name motherfucker:", placeholder="Contoh: Nigger")
+        name = st.text_input("Enter your name:", placeholder="Contoh: John Doe")
         submitted = st.form_submit_button("Start Chat")
         if submitted and name:
             st.session_state.username = name
@@ -56,7 +56,7 @@ if uploaded_file is not None:
         # Append PDF content to chat history without showing to the user
         st.session_state.chat_history.append({
             "role": "system",
-            "content": f"Here's the content from the uploaded PDF:\n{text}"
+            "content": f"Here's the content from the uploaded PDF."
         })
     
     elif uploaded_file.type == "text/csv":
@@ -65,7 +65,7 @@ if uploaded_file is not None:
         # Append CSV content to chat history without showing to the user
         st.session_state.chat_history.append({
             "role": "system",
-            "content": f"Here's the data from the uploaded CSV:\n{df.head()}"
+            "content": f"Here's the data from the uploaded CSV."
         })
     
     elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
@@ -74,7 +74,7 @@ if uploaded_file is not None:
         # Append Excel content to chat history without showing to the user
         st.session_state.chat_history.append({
             "role": "system",
-            "content": f"Here's the data from the uploaded Excel file:\n{df.head()}"
+            "content": f"Here's the data from the uploaded Excel file."
         })
 
     elif uploaded_file.type == "text/plain":
@@ -83,7 +83,7 @@ if uploaded_file is not None:
         # Append text file content to chat history without showing to the user
         st.session_state.chat_history.append({
             "role": "system",
-            "content": f"Here's the content from the uploaded text file:\n{text}"
+            "content": f"Here's the content from the uploaded text file."
         })
 
 # === RESET CHAT ===
@@ -106,14 +106,14 @@ for msg in st.session_state.chat_history[1:]:
         st.markdown(msg["content"])
 
 # === CHAT INPUT ===
-user_input = st.chat_input("What's on your mind vro...")
+user_input = st.chat_input("What's on your mind?")
 
 if user_input:
     st.session_state.chat_history.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    with st.spinner("Im thinking, be patient bitch..."):
+    with st.spinner("Im thinking, be patient..."):
         try:
             response = Generation.call(
                 api_key=DASHSCOPE_API_KEY,
